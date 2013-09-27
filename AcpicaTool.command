@@ -1,6 +1,6 @@
 #!/bin/bash
 #set -x
-verS="0.9"
+verS="1.0"
 function echob() {
 echo "`tput bold`$1`tput sgr0`"
 }
@@ -93,6 +93,17 @@ cd ..
 
 function compileIt() # compiles iasl acpiexec acpisrc acpixtract 
 {
+isPatched=$(cat "${WorkDir}"/acpica/source/os_specific/service_layers/osunixxf.c | grep 'termios.h')
+echo "Checking source/os_specific/service_layers/osunixxf.c"
+if [ "${isPatched:16:1}" == "s" ]; then
+	echo "Ok, isPatched, continuing"
+else
+	echo "Need to patch"
+	echo "Change #include <termio.h>"
+	echo "TO"
+	echo "#include <termios.h>"
+	open -e -W "${WorkDir}"/acpica/source/os_specific/service_layers/osunixxf.c
+fi
 if [ ! -d "${WorkDir}"/Tools ] || [ ! -d "${WorkDir}"/Log ]; then
 	echob "Make Tools and/or Log Folder"
 	mkdir "${WorkDir}"/Tools "${WorkDir}"/Log 
